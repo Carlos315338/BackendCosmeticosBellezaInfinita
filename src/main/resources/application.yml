@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: backendCosmeticosBellezaInfinita
+  cloud:
+   config:
+     enabled: false
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_user
+    username: myuser
+    password: mypass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
