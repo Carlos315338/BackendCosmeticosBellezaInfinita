@@ -5,14 +5,12 @@ import com.sena.backendCosmeticosBellezaInfinita.entity.Usuario;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UsuarioMapper {
 
-    @Mapping(source = "idUsuario", target = "idUsuario")
-    @Mapping(source = "nombreUsuario", target = "nombreUsuario")
-    @Mapping(source = "contrasenha", target = "contrasenha")
+    //@Mapping(target = "contrasenha", ignore = true)
     UsuarioDTO usuarioToUsuarioDTO(Usuario usuario);
-
     Usuario usuarioDtoDTOToUsuario(UsuarioDTO dto);
 }

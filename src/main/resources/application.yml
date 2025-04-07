@@ -1,4 +1,8 @@
 spring:
+  web:
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "*"
   application:
     name: backendCosmeticosBellezaInfinita
   cloud:

@@ -21,8 +21,6 @@ public class UsuarioServicesImpl implements UsuarioServices {
 
     public UsuarioDTO findById(String idDocumento) {
         Optional<Usuario> byId = usuarioRepository.findById(idDocumento);
-        usuarioMapper.usuarioToUsuarioDTO(byId.get());
-        UsuarioDTO usuarioDTO = byId.map(usuario -> usuarioMapper.usuarioToUsuarioDTO(usuario)).orElse(null);
-        return usuarioDTO;
+        return byId.map(usuario -> usuarioMapper.usuarioToUsuarioDTO(usuario)).orElse(null);
     }
 }
