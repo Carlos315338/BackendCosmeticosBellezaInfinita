@@ -4,11 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-//@Getter
-//@Setter
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@ToString
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 @Table(name = "usuarios")
 public class Usuario {
 
@@ -22,32 +22,8 @@ public class Usuario {
     @Column(name = "contrasenha", length = 255, nullable = false)
     private String contrasenha;
 
-    //@ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "id_rol", referencedColumnName = "id_rol")
-    //private Rol rol;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_rol", referencedColumnName = "id_rol")
+    private Rol rol;
 
-
-    public String getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(String idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-
-    public String getNombreUsuario() {
-        return nombreUsuario;
-    }
-
-    public void setNombreUsuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
-    }
-
-    public String getContrasenha() {
-        return contrasenha;
-    }
-
-    public void setContrasenha(String contrasenha) {
-        this.contrasenha = contrasenha;
-    }
 }
