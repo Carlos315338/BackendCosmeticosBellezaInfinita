@@ -1,18 +1,15 @@
 package com.sena.backendCosmeticosBellezaInfinita.dto;
 
 import lombok.*;
-import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class RolDTO {
+public class ModuloDTO {
 
-    private String idRol;
-    private String nombreRol;
-    private List<ModuloDTO> modulos;
-
+    private String id;
+    private String nombre;
 }
 
