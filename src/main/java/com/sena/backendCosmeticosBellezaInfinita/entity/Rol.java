@@ -3,6 +3,7 @@ package com.sena.backendCosmeticosBellezaInfinita.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -20,6 +21,15 @@ public class Rol {
 
     @Column(name = "nombre_rol", length = 50, nullable = false, unique = true)
     private String nombreRol;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "rol_modulo",
+            joinColumns = @JoinColumn(name = "id_rol"),
+            inverseJoinColumns = @JoinColumn(name = "id_modulo")
+    )
+    private List<Modulo> modulos;
+
 
 }
 
