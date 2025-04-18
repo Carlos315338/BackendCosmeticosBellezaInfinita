@@ -10,6 +10,7 @@ import com.sena.userCosmeticosBellezaInfinita.repository.RolRepository;
 import com.sena.userCosmeticosBellezaInfinita.repository.UsuarioRepository;
 import com.sena.userCosmeticosBellezaInfinita.services.CognitoPasswordService;
 import com.sena.userCosmeticosBellezaInfinita.services.UsuarioServices;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
@@ -18,6 +19,7 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.UsernameExi
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class UsuarioServicesImpl implements UsuarioServices {
 
@@ -61,13 +63,18 @@ public class UsuarioServicesImpl implements UsuarioServices {
     }
 
     @Override
-    public void cambiarContrasena(CambiarContrasenaDTO cambiarContrasena) {
-        Optional<Usuario> byId = usuarioRepository.findById(cambiarContrasena.getIdUser());
-        if (!byId.isPresent()) return;
-        Usuario usuario = byId.get();
-        cognitoPasswordService.cambiarContrasena(cambiarContrasena.getAccessToken(), cambiarContrasena.getContrasenaActual(), cambiarContrasena.getContrasenaNueva());
-        usuario.setContrasenha(cambiarContrasena.getContrasenaNueva());
-        cognitoPasswordService.cerrarSesionesGlobales(cambiarContrasena.getIdUser());
+    public String cambiarContrasena(CambiarContrasenaDTO cambiarContrasena) {
+        try {
+            Usuario usuario = usuarioRepository.findById(cambiarContrasena.getIdUser()).orElseThrow(() -> new UsuarioNoEncontradoException("El usuario con ID " + cambiarContrasena.getIdUser() + " no existe") );
+            cognitoPasswordService.cambiarContrasena(cambiarContrasena.getAccessToken(), cambiarContrasena.getContrasenaActual(), cambiarContrasena.getContrasenaNueva());
+            usuario.setContrasenha(cambiarContrasena.getContrasenaNueva());
+            cognitoPasswordService.cerrarSesionesGlobales(cambiarContrasena.getIdUser());
+            return "Cambnio de contraseña correctamente ";
+        } catch (UsuarioNoEncontradoException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -88,23 +95,32 @@ public class UsuarioServicesImpl implements UsuarioServices {
 
             return "Usuario creado exitosamente";
         } catch (RolNoEncontradoException e) {
+            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e.getMessage());
             return e.getMessage();
         }catch (UsernameExistsException e) {
+            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e.getMessage());
             return e.getMessage();
         } catch (InvalidParameterException e) {
+            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e.getMessage());
             return e.getMessage();
         } catch (CognitoIdentityProviderException e) {
+            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e.getMessage());
             return e.getMessage();
         }
     }
 
     @Override
-    public void cambiarContrasenaAdmin(CambiarClaveAdminDTO cambiarContrasena) {
-        Optional<Usuario> byId = usuarioRepository.findById(cambiarContrasena.getIdUser());
-        if (!byId.isPresent()) return;
-        Usuario usuario = byId.get();
-        cognitoPasswordService.cambiarClaveComoAdmin(cambiarContrasena.getIdUser(), cambiarContrasena.getContrasenaTemporal());
-        usuario.setContrasenha(cambiarContrasena.getContrasenaTemporal());
-        cognitoPasswordService.cerrarSesionesGlobales(cambiarContrasena.getIdUser());
+    public String cambiarContrasenaAdmin(CambiarClaveAdminDTO cambiarContrasena) {
+        try {
+            Usuario Usuario = usuarioRepository.findById(cambiarContrasena.getIdUser()).orElseThrow(() -> new RolNoEncontradoException("El Rol con el ID "+ cambiarContrasena.getIdUser()  +" No eciste"));
+            cognitoPasswordService.cambiarClaveComoAdmin(cambiarContrasena.getIdUser(), cambiarContrasena.getContrasenaTemporal());
+            Usuario.setContrasenha(cambiarContrasena.getContrasenaTemporal());
+            cognitoPasswordService.cerrarSesionesGlobales(cambiarContrasena.getIdUser());
+            usuarioRepository.save(Usuario);
+            return "Usuario creado exitosamente";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

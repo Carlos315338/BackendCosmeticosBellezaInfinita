@@ -29,17 +29,20 @@ public class UsuarioController {
     }
 
     @PostMapping("/cambio-clave")
-    public void cambioClave(@RequestBody CambiarContrasenaDTO dto) {
-        usuarioServices.cambiarContrasena(dto);
+    public ResponseEntity<ApiResponse<Void>> cambioClave(@RequestBody CambiarContrasenaDTO dto) {
+        String response = usuarioServices.cambiarContrasena(dto);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
     @PostMapping("/crearUsuario")
-    public void crearUsuario(@RequestBody CrearUsuarioDTO dto) {
-        usuarioServices.crearUsuario(dto);
+    public ResponseEntity<ApiResponse<Void>> crearUsuario(@RequestBody CrearUsuarioDTO dto) {
+        String response = usuarioServices.crearUsuario(dto);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
     @PostMapping("/cambio-clave-admin")
-    public void cambioClaveAdmin(@RequestBody CambiarClaveAdminDTO dto) {
-        usuarioServices.cambiarContrasenaAdmin(dto);
+    public ResponseEntity<ApiResponse<Void>> cambioClaveAdmin(@RequestBody CambiarClaveAdminDTO dto) {
+        String response = usuarioServices.cambiarContrasenaAdmin(dto);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 }
