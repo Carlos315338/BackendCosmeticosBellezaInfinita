@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.sena</groupId>
-	<artifactId>backendCosmeticosBellezaInfinita</artifactId>
+	<artifactId>userCosmeticosBellezaInfinita</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>backendCosmeticosBellezaInfinita</name>
+	<name>userCosmeticosBellezaInfinita</name>
 	<description>Project for Spring Boot Sena</description>
 	<url/>
 	<licenses>
