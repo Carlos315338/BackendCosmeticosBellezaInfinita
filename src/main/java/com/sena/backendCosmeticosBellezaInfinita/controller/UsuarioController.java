@@ -40,6 +40,6 @@ public class UsuarioController {
 
     @PostMapping("/cambio-clave-admin")
     public void cambioClaveAdmin(@RequestBody CambiarClaveAdminDTO dto) {
-        usuarioServices.cambiarContrasena(dto);
+        usuarioServices.cambiarContrasenaAdmin(dto);
     }
 }
