@@ -2,14 +2,22 @@ package com.sena.backendCosmeticosBellezaInfinita.services.impl;
 
 import com.sena.backendCosmeticosBellezaInfinita.dto.CambiarContrasenaDTO;
 import com.sena.backendCosmeticosBellezaInfinita.dto.ConfirmacionUserDTO;
+import com.sena.backendCosmeticosBellezaInfinita.dto.CrearUsuarioDTO;
 import com.sena.backendCosmeticosBellezaInfinita.dto.UsuarioDTO;
+import com.sena.backendCosmeticosBellezaInfinita.entity.Rol;
 import com.sena.backendCosmeticosBellezaInfinita.entity.Usuario;
+import com.sena.backendCosmeticosBellezaInfinita.exception.RolNoEncontradoException;
+import com.sena.backendCosmeticosBellezaInfinita.exception.UsuarioNoEncontradoException;
 import com.sena.backendCosmeticosBellezaInfinita.mapper.UsuarioMapper;
+import com.sena.backendCosmeticosBellezaInfinita.repository.RolRepository;
 import com.sena.backendCosmeticosBellezaInfinita.repository.UsuarioRepository;
 import com.sena.backendCosmeticosBellezaInfinita.services.CognitoPasswordService;
 import com.sena.backendCosmeticosBellezaInfinita.services.UsuarioServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidParameterException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.UsernameExistsException;
 
 import java.util.Optional;
 
@@ -20,25 +28,39 @@ public class UsuarioServicesImpl implements UsuarioServices {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
+    private RolRepository rolRepository;
+
+    @Autowired
     private UsuarioMapper usuarioMapper;
 
     @Autowired
     private CognitoPasswordService cognitoPasswordService;
 
     public UsuarioDTO findById(String idDocumento) {
-        Optional<Usuario> byId = usuarioRepository.findById(idDocumento);
-        UsuarioDTO usuarioDTO = byId.map(usuario -> usuarioMapper.usuarioToUsuarioDTO(usuario)).orElse(null);
-        return usuarioDTO;
+        try {
+
+            Usuario byId = usuarioRepository.findById(idDocumento).orElseThrow(() -> new UsuarioNoEncontradoException("El usuario con ID " + idDocumento + " no existe") );
+            UsuarioDTO usuarioDTO =  usuarioMapper.usuarioToUsuarioDTO(byId);
+            return usuarioDTO;
+        } catch (UsuarioNoEncontradoException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void cambiarClaveEnPrimerLogin(ConfirmacionUserDTO confirmacionUser) {
-        Optional<Usuario> byId = usuarioRepository.findById(confirmacionUser.getUsername());
-        if (!byId.isPresent()) return;
+    public String cambiarClaveEnPrimerLogin(ConfirmacionUserDTO confirmacionUser) {
 
-        Usuario usuario = byId.get();
-        cognitoPasswordService.cambiarClaveEnPrimerLogin(confirmacionUser.getUsername(), confirmacionUser.getTempPassword(), confirmacionUser.getNewPassword());
-        usuario.setContrasenha(confirmacionUser.getNewPassword());
+        try {
+            Usuario usuario = usuarioRepository.findById(confirmacionUser.getUsername()).orElseThrow(() -> new UsuarioNoEncontradoException("El usuario con ID " + confirmacionUser.getUsername() + " no existe") );;
+            cognitoPasswordService.cambiarClaveEnPrimerLogin(confirmacionUser.getUsername(), confirmacionUser.getTempPassword(), confirmacionUser.getNewPassword());
+            usuario.setContrasenha(confirmacionUser.getNewPassword());
+            cognitoPasswordService.cerrarSesionesGlobales(confirmacionUser.getUsername());
+            return "Cambio de contraseña exitosa";
+        } catch (UsuarioNoEncontradoException e) {
+            return e.getMessage();
+        } catch (CognitoIdentityProviderException e) {
+            return "Servicio no responde";
+        }
     }
 
     @Override
@@ -48,6 +70,34 @@ public class UsuarioServicesImpl implements UsuarioServices {
         Usuario usuario = byId.get();
         cognitoPasswordService.cambiarContrasena(cambiarContrasena.getAccessToken(), cambiarContrasena.getContrasenaActual(), cambiarContrasena.getContrasenaNueva());
         usuario.setContrasenha(cambiarContrasena.getContrasenaNueva());
+        cognitoPasswordService.cerrarSesionesGlobales(cambiarContrasena.getIdUser());
     }
 
+    @Override
+    public String crearUsuario(CrearUsuarioDTO dto) {
+
+        try {
+
+            Rol byId = rolRepository.findById(dto.getRolId()).orElseThrow(() -> new RolNoEncontradoException("El Rol con el ID "+ dto.getRolId()  +" No eciste"));
+
+            Usuario usuarioNuevo =  new Usuario();
+            usuarioNuevo.setNombreUsuario(dto.getUserName());
+            usuarioNuevo.setIdUsuario(dto.getUserId());
+            usuarioNuevo.setContrasenha(dto.getUserId());
+            usuarioNuevo.setRol(byId);
+
+            Usuario save = usuarioRepository.save(usuarioNuevo);
+            cognitoPasswordService.crearUsuario(save.getIdUsuario(), dto.getEmail(), save.getNombreUsuario(), dto.getPhoneNumber());
+
+            return "Usuario creado exitosamente";
+        } catch (RolNoEncontradoException e) {
+            return e.getMessage();
+        }catch (UsernameExistsException e) {
+            return e.getMessage();
+        } catch (InvalidParameterException e) {
+            return e.getMessage();
+        } catch (CognitoIdentityProviderException e) {
+            return e.getMessage();
+        }
+    }
 }

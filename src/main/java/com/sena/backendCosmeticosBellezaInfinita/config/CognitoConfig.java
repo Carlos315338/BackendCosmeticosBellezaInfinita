@@ -12,8 +12,8 @@ public class CognitoConfig {
     @Bean
     public CognitoIdentityProviderClient cognitoIdentityProviderClient() {
         return CognitoIdentityProviderClient.builder()
-                .region(Region.US_EAST_2)
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .build();
+            .region(Region.US_EAST_2)
+            .credentialsProvider(DefaultCredentialsProvider.create())
+            .build();
     }
 }
