@@ -1,9 +1,6 @@
 package com.sena.backendCosmeticosBellezaInfinita.services.impl;
 
-import com.sena.backendCosmeticosBellezaInfinita.dto.CambiarContrasenaDTO;
-import com.sena.backendCosmeticosBellezaInfinita.dto.ConfirmacionUserDTO;
-import com.sena.backendCosmeticosBellezaInfinita.dto.CrearUsuarioDTO;
-import com.sena.backendCosmeticosBellezaInfinita.dto.UsuarioDTO;
+import com.sena.backendCosmeticosBellezaInfinita.dto.*;
 import com.sena.backendCosmeticosBellezaInfinita.entity.Rol;
 import com.sena.backendCosmeticosBellezaInfinita.entity.Usuario;
 import com.sena.backendCosmeticosBellezaInfinita.exception.RolNoEncontradoException;
@@ -99,5 +96,15 @@ public class UsuarioServicesImpl implements UsuarioServices {
         } catch (CognitoIdentityProviderException e) {
             return e.getMessage();
         }
+    }
+
+    @Override
+    public void cambiarContrasenaAdmin(CambiarClaveAdminDTO cambiarContrasena) {
+        Optional<Usuario> byId = usuarioRepository.findById(cambiarContrasena.getIdUser());
+        if (!byId.isPresent()) return;
+        Usuario usuario = byId.get();
+        cognitoPasswordService.cambiarClaveComoAdmin(cambiarContrasena.getIdUser(), cambiarContrasena.getContrasenaTemporal());
+        usuario.setContrasenha(cambiarContrasena.getContrasenaTemporal());
+        cognitoPasswordService.cerrarSesionesGlobales(cambiarContrasena.getIdUser());
     }
 }

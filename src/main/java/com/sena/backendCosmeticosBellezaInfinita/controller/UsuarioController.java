@@ -2,17 +2,20 @@ package com.sena.backendCosmeticosBellezaInfinita.controller;
 
 import com.sena.backendCosmeticosBellezaInfinita.dto.*;
 import com.sena.backendCosmeticosBellezaInfinita.services.UsuarioServices;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/usuario")
+@Tag(name = "tag_at_class_level", description = "Books related class level tag")
 public class UsuarioController {
 
     @Autowired
     private UsuarioServices usuarioServices;
 
+    @Tag(name = "create")
     @GetMapping("/findbyId/{idDocumento}")
     public ResponseEntity<ApiResponse<UsuarioDTO>> findbyId(@PathVariable String idDocumento) {
         UsuarioDTO byId = usuarioServices.findById(idDocumento);
@@ -33,5 +36,10 @@ public class UsuarioController {
     @PostMapping("/crearUsuario")
     public void crearUsuario(@RequestBody CrearUsuarioDTO dto) {
         usuarioServices.crearUsuario(dto);
+    }
+
+    @PostMapping("/cambio-clave-admin")
+    public void cambioClaveAdmin(@RequestBody CambiarClaveAdminDTO dto) {
+        usuarioServices.cambiarContrasena(dto);
     }
 }
