@@ -2,20 +2,28 @@ package com.sena.userCosmeticosBellezaInfinita.controller;
 
 import com.sena.userCosmeticosBellezaInfinita.dto.*;
 import com.sena.userCosmeticosBellezaInfinita.services.UsuarioServices;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/usuario")
-@Tag(name = "tag_at_class_level", description = "Books related class level tag")
 public class UsuarioController {
 
     @Autowired
     private UsuarioServices usuarioServices;
 
-    @Tag(name = "create")
+    @GetMapping("/obtenerListaUsuarios")
+    public ResponseEntity<ApiResponse<Page<UsuarioDTO>>> obtenerUsuarios(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Page<UsuarioDTO> usuarios = usuarioServices.findAll(page, size);
+
+        return ResponseEntity.ok(ApiResponse.ok("Operacion Exitosa", usuarios));
+
+    }
+
     @GetMapping("/findbyId/{idDocumento}")
     public ResponseEntity<ApiResponse<UsuarioDTO>> findbyId(@PathVariable String idDocumento) {
         UsuarioDTO byId = usuarioServices.findById(idDocumento);
