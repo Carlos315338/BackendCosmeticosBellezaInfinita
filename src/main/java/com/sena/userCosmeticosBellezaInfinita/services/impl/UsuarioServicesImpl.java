@@ -21,7 +21,6 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidPara
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UsernameExistsException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
