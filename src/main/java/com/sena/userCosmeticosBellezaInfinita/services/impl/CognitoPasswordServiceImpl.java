@@ -105,8 +105,7 @@ public class CognitoPasswordServiceImpl implements CognitoPasswordService {
                 AttributeType.builder().name("custom:idUser").value(idUser).build(),
                 AttributeType.builder().name("name").value(name).build()
             )
-            .desiredDeliveryMediums(DeliveryMediumType.EMAIL)
-            .messageAction(MessageActionType.RESEND);
+            .desiredDeliveryMediums(DeliveryMediumType.EMAIL);
 
         AdminCreateUserResponse response = cognitoClient.adminCreateUser(requestBuilder.build());
 

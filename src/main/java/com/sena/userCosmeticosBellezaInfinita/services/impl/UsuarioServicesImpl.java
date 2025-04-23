@@ -122,16 +122,16 @@ public class UsuarioServicesImpl implements UsuarioServices {
 
             return "Usuario creado exitosamente";
         } catch (RolNoEncontradoException e) {
-            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e.getMessage());
+            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e);
             return e.getMessage();
         } catch (UsernameExistsException e) {
-            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e.getMessage());
+            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e);
             return e.getMessage();
         } catch (InvalidParameterException e) {
-            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e.getMessage());
+            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e);
             return e.getMessage();
         } catch (CognitoIdentityProviderException e) {
-            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e.getMessage());
+            log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e);
             return e.getMessage();
         }
     }
