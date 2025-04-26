@@ -11,4 +11,5 @@ public interface UsuarioServices {
     public String cambiarContrasena(CambiarContrasenaDTO cambiarContrasena);
     public String crearUsuario(CrearUsuarioDTO dto);
     public String cambiarContrasenaAdmin(CambiarClaveAdminDTO cambiarContrasena);
+    public String eliminarUsuario(String id);
 }

@@ -7,4 +7,5 @@ public interface CognitoPasswordService {
     public void cerrarSesionesGlobales(String username);
     public void crearUsuario(String username, String email, String name, String phoneNumber);
     public void cambiarClaveComoAdmin(String username, String nuevaContrasena);
+    public void eliminarUsuario(String username);
 }

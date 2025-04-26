@@ -21,6 +21,7 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidPara
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UsernameExistsException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -107,6 +108,10 @@ public class UsuarioServicesImpl implements UsuarioServices {
 
         try {
 
+            Optional<Usuario> existe = usuarioRepository.findById(dto.getUserName());
+
+            if(!existe.isPresent()) throw new RuntimeException("El Usuario Existe");
+
             Rol byId = rolRepository.findById(dto.getRolId()).orElseThrow(
                     () -> new RolNoEncontradoException("El Rol con el ID " + dto.getRolId() + " No eciste"));
 
@@ -133,6 +138,9 @@ public class UsuarioServicesImpl implements UsuarioServices {
         } catch (CognitoIdentityProviderException e) {
             log.info("Error crearUsuario usuario {}  : {}", dto.getRolId(), e);
             return e.getMessage();
+        }catch (Exception e){
+            log.info("Error crearUsuario usuario {}", dto.getUserName());
+            return "Error Procesando La solicitud";
         }
     }
 
@@ -142,15 +150,30 @@ public class UsuarioServicesImpl implements UsuarioServices {
             Usuario Usuario = usuarioRepository.findById(cambiarContrasena.getIdUser())
                     .orElseThrow(() -> new RolNoEncontradoException(
                             "El Rol con el ID " + cambiarContrasena.getIdUser() + " No eciste"));
+
             cognitoPasswordService.cambiarClaveComoAdmin(cambiarContrasena.getIdUser(),
                     cambiarContrasena.getContrasenaTemporal());
             Usuario.setContrasenha(cambiarContrasena.getContrasenaTemporal());
             cognitoPasswordService.cerrarSesionesGlobales(cambiarContrasena.getIdUser());
             usuarioRepository.save(Usuario);
-            return "Usuario creado exitosamente";
+
+            return "Cambio de Contraseña exitosamente";
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            // throw new RuntimeException(e);
+            return "Error Cambio de contraseña";
         }
 
+    }
+
+    @Override
+    public String eliminarUsuario(String id) {
+        try {
+            usuarioRepository.deleteById(id);
+            cognitoPasswordService.eliminarUsuario(id); 
+            return "Operacion Exitosa";
+        } catch (Exception e) {
+            log.info("eliminacion id: {}, error: {}", id, e);
+            return "Error Eliminacion";
+        }
     }
 }

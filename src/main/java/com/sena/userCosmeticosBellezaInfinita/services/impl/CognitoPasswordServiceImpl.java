@@ -28,27 +28,25 @@ public class CognitoPasswordServiceImpl implements CognitoPasswordService {
         parameters.put("PASSWORD", tempPassword);
 
         AdminInitiateAuthResponse authResponse = cognitoClient.adminInitiateAuth(
-            AdminInitiateAuthRequest.builder()
-                .authFlow(AuthFlowType.ADMIN_NO_SRP_AUTH)
-                .userPoolId(userPoolId)
-                .clientId(clientId)
-                .authParameters(parameters)
-                .build()
-        );
+                AdminInitiateAuthRequest.builder()
+                        .authFlow(AuthFlowType.ADMIN_NO_SRP_AUTH)
+                        .userPoolId(userPoolId)
+                        .clientId(clientId)
+                        .authParameters(parameters)
+                        .build());
 
         HashMap<String, String> challengeResponses = new HashMap<>();
         challengeResponses.put("USERNAME", username);
         challengeResponses.put("NEW_PASSWORD", nuevaPassword);
 
         cognitoClient.adminRespondToAuthChallenge(
-            AdminRespondToAuthChallengeRequest.builder()
-                .challengeName(ChallengeNameType.NEW_PASSWORD_REQUIRED)
-                .userPoolId(userPoolId)
-                .clientId(clientId)
-                .challengeResponses(challengeResponses)
-                .session(authResponse.session())
-                .build()
-        );
+                AdminRespondToAuthChallengeRequest.builder()
+                        .challengeName(ChallengeNameType.NEW_PASSWORD_REQUIRED)
+                        .userPoolId(userPoolId)
+                        .clientId(clientId)
+                        .challengeResponses(challengeResponses)
+                        .session(authResponse.session())
+                        .build());
     }
 
     public void cambiarContrasena(String accessToken, String contrasenaActual, String contrasenaNueva) {
@@ -81,7 +79,7 @@ public class CognitoPasswordServiceImpl implements CognitoPasswordService {
                     .permanent(false)
                     .build();
 
-            AdminSetUserPasswordResponse response = cognitoClient.adminSetUserPassword(request);
+            cognitoClient.adminSetUserPassword(request);
             System.out.println("Contraseña modificada exitosamente");
 
         } catch (CognitoIdentityProviderException e) {
@@ -93,23 +91,30 @@ public class CognitoPasswordServiceImpl implements CognitoPasswordService {
     public void crearUsuario(String idUser, String email, String name, String phoneNumber) {
 
         AdminCreateUserRequest.Builder requestBuilder = AdminCreateUserRequest.builder()
-            .userPoolId(userPoolId)
-            .username(idUser)
-            .userAttributes(
-                AttributeType.builder().name("email").value(email).build(),
-                AttributeType.builder().name("email_verified").value("true").build(),
+                .userPoolId(userPoolId)
+                .username(idUser)
+                .userAttributes(
+                        AttributeType.builder().name("email").value(email).build(),
+                        AttributeType.builder().name("email_verified").value("true").build(),
 
-                AttributeType.builder().name("phone_number").value(phoneNumber).build(),
-                AttributeType.builder().name("phone_number_verified").value("true").build(),
+                        AttributeType.builder().name("phone_number").value(phoneNumber).build(),
+                        AttributeType.builder().name("phone_number_verified").value("true").build(),
 
-                AttributeType.builder().name("custom:idUser").value(idUser).build(),
-                AttributeType.builder().name("name").value(name).build()
-            )
-            .desiredDeliveryMediums(DeliveryMediumType.EMAIL);
+                        AttributeType.builder().name("custom:idUser").value(idUser).build(),
+                        AttributeType.builder().name("name").value(name).build())
+                .desiredDeliveryMediums(DeliveryMediumType.EMAIL);
 
         AdminCreateUserResponse response = cognitoClient.adminCreateUser(requestBuilder.build());
 
         System.out.println("Usuario creado: " + response.user().username());
     }
-}
 
+    public void eliminarUsuario(String username) {
+        cognitoClient.adminDeleteUser(AdminDeleteUserRequest.builder()
+                .userPoolId(userPoolId)
+                .username(username)
+                .build());
+        System.out.println("Usuario eliminado correctamente de Cognito: " + username);
+    }
+
+}

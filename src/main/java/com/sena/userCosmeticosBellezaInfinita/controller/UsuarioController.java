@@ -21,7 +21,6 @@ public class UsuarioController {
         Page<UsuarioDTO> usuarios = usuarioServices.findAll(page, size);
 
         return ResponseEntity.ok(ApiResponse.ok("Operacion Exitosa", usuarios));
-
     }
 
     @GetMapping("/findbyId/{idDocumento}")
@@ -52,5 +51,11 @@ public class UsuarioController {
     public ResponseEntity<ApiResponse<Void>> cambioClaveAdmin(@RequestBody CambiarClaveAdminDTO dto) {
         String response = usuarioServices.cambiarContrasenaAdmin(dto);
         return ResponseEntity.ok(ApiResponse.ok(response));
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<ApiResponse<Void>> eliminarUsuario(@PathVariable String id){
+        String eliminacion = usuarioServices.eliminarUsuario(id);
+        return ResponseEntity.ok(ApiResponse.ok(eliminacion));
     }
 }
