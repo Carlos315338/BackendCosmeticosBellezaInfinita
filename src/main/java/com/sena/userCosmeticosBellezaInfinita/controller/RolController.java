@@ -13,7 +13,7 @@ import com.sena.userCosmeticosBellezaInfinita.dto.RolSelectDTO;
 import com.sena.userCosmeticosBellezaInfinita.services.RolService;
 
 @RestController
-@RequestMapping("api/roles")
+@RequestMapping("roles")
 public class RolController {
 
     @Autowired
